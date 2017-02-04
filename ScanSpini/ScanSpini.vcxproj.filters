@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="MainFile.cpp" />
+    <ClCompile Include="MainWidget.cpp" />
+    <ClCompile Include="Data3D.cpp" />
+    <ClCompile Include="Primitives\ShapeGenerator.cpp" />
+    <ClCompile Include="GraphicalControls.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="FileControls.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="FileControls_moc.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="LeftGLWindow.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsControls.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="InfoControls.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+    <ClCompile Include="SettingsControls_moc.cpp">
+      <Filter>ViewControls</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MainWidget.h" />
+    <ClInclude Include="Data3D.h" />
+    <ClInclude Include="Vector3D.h" />
+    <ClInclude Include="Primitives\Vertex.h" />
+    <ClInclude Include="Primitives\ShapeData.h" />
+    <ClInclude Include="Primitives\ShapeGenerator.h" />
+    <ClInclude Include="VertexWithNormal.h" />
+    <ClInclude Include="GraphicalControls.h">
+      <Filter>ViewControls</Filter>
+    </ClInclude>
+    <ClInclude Include="FileControls.h">
+      <Filter>ViewControls</Filter>
+    </ClInclude>
+    <ClInclude Include="LeftGLWindow.h">
+      <Filter>ViewControls</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingsControls.h">
+      <Filter>ViewControls</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoControls.h">
+      <Filter>ViewControls</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexPosition.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="VertexBodyShared.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="VertexShaderCode.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="FragmentBodyShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="FragmentShaderCode.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="VertexShaderCodeLine.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="FragmentShaderCodeLine.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="VertexShaderCodeLines.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="FragmentShaderCodeLines.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ac123b90-dd0a-431e-af5d-a64426899290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ViewControls">
+      <UniqueIdentifier>{81edc4bb-5ec6-41a7-940a-558348fdcb6f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

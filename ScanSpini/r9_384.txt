@@ -1,0 +1,4 @@
+Horizont number: 0; Number of points: 0----------------------------------------
+Horizont number: 1; Number of points: 0----------------------------------------
+Horizont number: 2; Number of points: 0----------------------------------------
+Horizont number: 3; Number of points: 0----------------------------------------

@@ -13,14 +13,12 @@
 #include "Data3D.h"
 #include "GraphicalControls.h"
 #include "LeftGLWindow.h"
-#include "MiddleGLWindow.h"
 
 
 class GraphicalControls : public QWidget
 {
 	Data3D *data3D;
 	LeftGLWindow *leftGLWindow;
-	MiddleGLWindow *middleGLWindow;
 public:
 	GraphicalControls(Data3D *data3D);
 	~GraphicalControls();

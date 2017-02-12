@@ -49,6 +49,8 @@ protected:
 	float fovYinRadian;
 	float roatationInRadian;
 	float modelDistance;
+	float modelDistanceMiddle;
+	float modelDistanceRight;
 	float rightBorderShift = 0.0f;
 	float leftBorderShift = 0.0f;
 	float topBorderShift = 0.0f;
@@ -97,12 +99,20 @@ protected:
 	int newMousePosistionY;
 	int oldmousePositionY;
 
+	int mousePressPositionX;
+	int mousePressPositionY;
+
+	float aspectRatio;
+
 	void mouseMoveEvent(QMouseEvent* e);
 	void mousePressEvent(QMouseEvent *e);
 	void mouseReleaseEvent(QMouseEvent *e);
 	void modelDistanceUpdate(int mousePointerY);
+	void modelDistanceUpdate(int mousePointerY, int pressX, int pressY);
 
 	void keyPressEvent(QKeyEvent *e);
+
+	int widthViewPort;
 	
 public:
 	void callUpdate();

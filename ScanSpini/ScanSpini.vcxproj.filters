@@ -26,7 +26,6 @@
     <ClCompile Include="SettingsControls_moc.cpp">
       <Filter>ViewControls</Filter>
     </ClCompile>
-    <ClCompile Include="MiddleGLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWidget.h" />
@@ -52,7 +51,6 @@
       <Filter>ViewControls</Filter>
     </ClInclude>
     <ClInclude Include="VertexPosition.h" />
-    <ClInclude Include="MiddleGLWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VertexBodyShared.glsl">

@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
 	MainWidget mainWidg;
-	mainWidg.setGeometry(50, 50, 800, 600);
+	mainWidg.setGeometry(50, 50, 1200, 600);
 	mainWidg.show();
 	return app.exec();
 }

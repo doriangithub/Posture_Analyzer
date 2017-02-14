@@ -403,11 +403,8 @@ void LeftGLWindow::paintGL()
 	int rightP2y = heightAll;
 
 	// aspect ratio
-
 	aspectRatio = (1.0/3.0) / 1.0;
-		
 	glm::mat4 scaleMatrix;
-
 	if (aspectRatio > 1.0)
 	{
 		scaleMatrix = glm::scale(glm::mat4(), glm::vec3(1.0f/ aspectRatio, 1.0f, 1.0f));
@@ -417,134 +414,168 @@ void LeftGLWindow::paintGL()
 		scaleMatrix = glm::scale(glm::mat4(), glm::vec3(1.0f, aspectRatio, 1.0f));
 	}
 
-	for (int loop = 0; loop < 4; loop++)								// Loop To Draw Our 4 Views
+	// set views for viewports
+	
+	// calculate how tall body is
+	//float xMin = data3D->getMinXsurfPoint().x;
+	//float xMax = data3D->getMaxXsurfPoint().x;
+
+	float yMin = data3D->getMinYsurfPoint().y;
+	float yMax = data3D->getMaxYsurfPoint().y;
+
+	float camPosY1 = ((abs(yMin) + abs(yMax)) / 3.0) / 2.0 + yMin;	// left view will show top part of the body
+	float camPosY2 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY1;	// middle view will show middle part of the body
+	float camPosY3 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY2;	// right view will show bottom part of the body
+
+
+	for (int loop = 0; loop < 3; loop++)								// Loop To Draw Our 4 Views
 	{
-		if (loop == 0)													// If We Are Drawing The First Scene
+
+		// Set The Viewport To The Left. 
+
+		glViewport(leftP1x, leftP1y, leftP2x, leftP2y);
+		fovYinRadian = 0.3; // 0.6490658504f;
+
+		if (loop == 0)
 		{
-			// Set The Viewport To The Left. 
 			glViewport(leftP1x, leftP1y, leftP2x, leftP2y);
+			fovYinRadian = 0.3;
+		}
+		if (loop == 1)
+		{
+			glViewport(middleP1x, middleP1y, middleP2x, middleP2y);
+			fovYinRadian = 0.1;
+		}
 
-			glUseProgram(programID);
-			glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -2.0f));
-			glm::mat4 rotationMatrix = glm::rotate(glm::mat4(), -1.5707963268f, glm::vec3(0.0f, 0.0f, 1.0f));
-			glm::mat4 projectionMatrix = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+		glUseProgram(programID);
+		//glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -2.0f));
+		//glm::mat4 rotationMatrix = glm::rotate(glm::mat4(), -1.5707963268f, glm::vec3(0.0f, 0.0f, 1.0f));
+		//glm::mat4 projectionMatrix = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+		//
+		//glm::mat4 fullTransfomMatrix = projectionMatrix * translationMatrix * scaleMatrix * rotationMatrix;
+		//
+		//GLint fullTransfomMatrixUniformLocation = glGetUniformLocation(programID, "fullTransfomMatrix");
+		//glUniformMatrix4fv(fullTransfomMatrixUniformLocation, 1, GL_FALSE, &fullTransfomMatrix[0][0]);
 
-			glm::mat4 fullTransfomMatrix = projectionMatrix * translationMatrix * scaleMatrix * rotationMatrix;
+		// SET UP LIGHT
 
-			GLint fullTransfomMatrixUniformLocation = glGetUniformLocation(programID, "fullTransfomMatrix");
-			glUniformMatrix4fv(fullTransfomMatrixUniformLocation, 1, GL_FALSE, &fullTransfomMatrix[0][0]);
+		GLint lightPositionUniformLocation = glGetUniformLocation(programID, "lightPosition");
+		glm::vec3 lightPosition(0.8f, 0.5f, 0.0f);
+		glUniform3fv(lightPositionUniformLocation, 1, &lightPosition[0]);
 
-			// SET UP LIGHT
+		GLint ambientLightUniformLocation = glGetUniformLocation(programID, "ambientLight");
+		glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
+		glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
 
-			GLint lightPositionUniformLocation = glGetUniformLocation(programID, "lightPosition");
-			glm::vec3 lightPosition(0.8f, 0.5f, 0.0f);
-			glUniform3fv(lightPositionUniformLocation, 1, &lightPosition[0]);
+		if (showBody)
+		{
+			// BODY
+			glBindVertexArray(bodyVertexArrayObjectID);
 
-			GLint ambientLightUniformLocation = glGetUniformLocation(programID, "ambientLight");
-			glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
-			glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
+			float shiftBody = 0.0f;
+			modelDistance = -0.5f;
 
-			if (showBody)
+			if (loop == 0)
 			{
-
-				// BODY
-				glBindVertexArray(bodyVertexArrayObjectID);
-
-				glm::mat4 translationMatrixBody = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, modelDistance));
-				glm::mat4 rotationMatrixBody = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
-				glm::mat4 projectionMatrixBody = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
-
-				glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * translationMatrixBody * scaleMatrix * rotationMatrixBody;
-
-				GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
-				glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
-
-				glDrawArrays(GL_TRIANGLES, 0, numBobyVertices);
-
+				shiftBody = 0.0f;
+				modelDistance = -0.5f;
+			}
+			if (loop == 1)
+			{
+				shiftBody = -0.1f;
+				modelDistance = -0.2f;
 			}
 
-			if (showBorders)
-			{
-				// RIGHT BORDER
+			glm::mat4 translationMatrixBody = glm::translate(glm::mat4(), glm::vec3(0.0f, shiftBody, modelDistance));
+			glm::mat4 rotationMatrixBody = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixBody = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-				glBindVertexArray(rightBorderVertexArrayObjectID);
-				GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
-				glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
+			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * translationMatrixBody * scaleMatrix * rotationMatrixBody;
 
-				glm::mat4 translationMatrixBodyRightBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + rightBorderShift, 0.0f, modelDistance));
-				glm::mat4 rotationMatrixBodyRightBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
-				glm::mat4 projectionMatrixBodyRightBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+			GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
 
-				glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder *
-					translationMatrixBodyRightBorder * scaleMatrix * rotationMatrixBodyRightBorder;
+			glDrawArrays(GL_TRIANGLES, 0, numBobyVertices);
 
-				GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
-				glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyRightBorder, 1, GL_FALSE,
-					&fullTransfomMatrixBodyRightBorder[0][0]);
+		}
 
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+		if (showBorders)
+		{
+			// RIGHT BORDER
 
-				// LEFT BORDER
+			glBindVertexArray(rightBorderVertexArrayObjectID);
+			//GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
+			//glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
 
-				glBindVertexArray(leftBorderVertexArrayObjectID);
-				//GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
-				//glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
+			glm::mat4 translationMatrixBodyRightBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + rightBorderShift, 0.0f, modelDistance));
+			glm::mat4 rotationMatrixBodyRightBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixBodyRightBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-				glm::mat4 translationMatrixBodyLeftBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + leftBorderShift, 0.0f, modelDistance));
-				glm::mat4 rotationMatrixBodyLeftBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
-				glm::mat4 projectionMatrixBodyLeftBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder *
+				translationMatrixBodyRightBorder * scaleMatrix * rotationMatrixBodyRightBorder;
 
-				glm::mat4 fullTransfomMatrixBodyLeftBorder = projectionMatrixBodyLeftBorder *
-					translationMatrixBodyLeftBorder * scaleMatrix * rotationMatrixBodyLeftBorder;
+			GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyRightBorder, 1, GL_FALSE,
+				&fullTransfomMatrixBodyRightBorder[0][0]);
 
-				GLint fullTransfomMatrixUniformLocationBodyLeftBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
-				glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyLeftBorder, 1, GL_FALSE,
-					&fullTransfomMatrixBodyLeftBorder[0][0]);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+			// LEFT BORDER
 
+			glBindVertexArray(leftBorderVertexArrayObjectID);
 
-				// TOP BORDER
+			glm::mat4 translationMatrixBodyLeftBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + leftBorderShift, 0.0f, modelDistance));
+			glm::mat4 rotationMatrixBodyLeftBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixBodyLeftBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-				glBindVertexArray(topBorderVertexArrayObjectID);
-				//GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
-				//glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
+			glm::mat4 fullTransfomMatrixBodyLeftBorder = projectionMatrixBodyLeftBorder *
+				translationMatrixBodyLeftBorder * scaleMatrix * rotationMatrixBodyLeftBorder;
 
-				glm::mat4 translationMatrixBodyTopBorder = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f + topBorderShift, modelDistance));
-				glm::mat4 rotationMatrixBodyTopBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
-				glm::mat4 projectionMatrixBodyTopBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+			GLint fullTransfomMatrixUniformLocationBodyLeftBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyLeftBorder, 1, GL_FALSE,
+				&fullTransfomMatrixBodyLeftBorder[0][0]);
 
-				glm::mat4 fullTransfomMatrixBodyTopBorder = projectionMatrixBodyTopBorder *
-					translationMatrixBodyTopBorder * scaleMatrix * rotationMatrixBodyTopBorder;
-
-				GLint fullTransfomMatrixUniformLocationBodyTopBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
-				glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyTopBorder, 1, GL_FALSE,
-					&fullTransfomMatrixBodyTopBorder[0][0]);
-
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
-				// BOTTOM BORDER
+			// TOP BORDER
 
-				glBindVertexArray(bottomBorderVertexArrayObjectID);
-				//GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
-				//glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
+			glBindVertexArray(topBorderVertexArrayObjectID);
 
-				glm::mat4 translationMatrixBodyBottomBorder = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f + bottomBorderShift, modelDistance));
-				glm::mat4 rotationMatrixBodyBottomBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
-				glm::mat4 projectionMatrixBodyBottomBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+			glm::mat4 translationMatrixBodyTopBorder = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f + topBorderShift, modelDistance));
+			glm::mat4 rotationMatrixBodyTopBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixBodyTopBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-				glm::mat4 fullTransfomMatrixBodyBottomBorder = projectionMatrixBodyBottomBorder *
-					translationMatrixBodyBottomBorder * scaleMatrix * rotationMatrixBodyBottomBorder;
+			glm::mat4 fullTransfomMatrixBodyTopBorder = projectionMatrixBodyTopBorder *
+				translationMatrixBodyTopBorder * scaleMatrix * rotationMatrixBodyTopBorder;
 
-				GLint fullTransfomMatrixUniformLocationBodyBottomBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
-				glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyBottomBorder, 1, GL_FALSE,
-					&fullTransfomMatrixBodyBottomBorder[0][0]);
+			GLint fullTransfomMatrixUniformLocationBodyTopBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyTopBorder, 1, GL_FALSE,
+				&fullTransfomMatrixBodyTopBorder[0][0]);
 
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
+			// BOTTOM BORDER
+
+			glBindVertexArray(bottomBorderVertexArrayObjectID);
+
+			glm::mat4 translationMatrixBodyBottomBorder = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f + bottomBorderShift, modelDistance));
+			glm::mat4 rotationMatrixBodyBottomBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixBodyBottomBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
+
+			glm::mat4 fullTransfomMatrixBodyBottomBorder = projectionMatrixBodyBottomBorder *
+				translationMatrixBodyBottomBorder * scaleMatrix * rotationMatrixBodyBottomBorder;
+
+			GLint fullTransfomMatrixUniformLocationBodyBottomBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyBottomBorder, 1, GL_FALSE,
+				&fullTransfomMatrixBodyBottomBorder[0][0]);
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		if (showLines)
+		{
 			// LINES
 			glUseProgram(programLinesID);
 			GLint ambientLightUniformLocationLines = glGetUniformLocation(programLinesID, "ambientLight");
@@ -573,10 +604,6 @@ void LeftGLWindow::paintGL()
 			}
 		}
 
-		if (loop == 1)													// If We Are Drawing The First Scene
-		{
-
-		}
 	}
 
 }
@@ -886,6 +913,48 @@ void LeftGLWindow::loadTopBorder()
 
 }
 
+void LeftGLWindow::loadMiddleTopBorder()
+{
+	glBindVertexArray(middleTopBorderVertexArrayObjectID);
+
+	glGenBuffers(1, &middleTopBorderVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, middleTopBorderVertexBufferID);
+
+	GLsizeiptr allLinesBuffSize = 0;
+	ShapeData topBorderShape = ShapeGenerator::makeTopBorder(this->data3D);
+
+	numVerticesTopBorder = topBorderShape.numVertices;
+	rightBorderBuffSize = topBorderShape.vertexPositionBufferSize();
+
+	glBufferData(GL_ARRAY_BUFFER, topBorderShape.vertexBufferSize(), topBorderShape.verticesWithNormal, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 6));
+
+}
+
+
+void LeftGLWindow::loadMiddleBottomBorder()
+{
+	glBindVertexArray(topBorderVertexArrayObjectID);
+
+	glGenBuffers(1, &topBorderVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, topBorderVertexBufferID);
+
+	//GLsizeiptr allLinesBuffSize = 0;
+	ShapeData middleTopBorderShape = ShapeGenerator::makeMiddleTopBorder(this->data3D);
+
+	numVerticesTopBorder = middleTopBorderShape.numVertices;
+	rightBorderBuffSize = middleTopBorderShape.vertexPositionBufferSize();
+
+	glBufferData(GL_ARRAY_BUFFER, middleTopBorderShape.vertexBufferSize(), middleTopBorderShape.verticesWithNormal, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 6));
+
+}
 
 void LeftGLWindow::loadBottomBorder()
 {
@@ -1074,6 +1143,10 @@ void LeftGLWindow::keyPressEvent(QKeyEvent *e)
 		break;
 	case Qt::Key::Key_V:
 		showBorders = !showBorders;
+		repaint();
+		break;
+	case Qt::Key::Key_Right:
+		shift = shift + 0.001;
 		repaint();
 		break;
 	}

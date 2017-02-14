@@ -24,6 +24,8 @@ public:
 	void loadRightBorder();
 	void loadLeftBorder();
 	void loadTopBorder();
+	void loadMiddleTopBorder();
+	void loadMiddleBottomBorder();
 	void loadBottomBorder();
 
 protected:
@@ -57,6 +59,7 @@ protected:
 	float bottomBorderShift = 0.0f;
 	bool showBody = true;
 	bool showBorders = true;
+	bool showLines = true;
 
 	GLuint programID;
 	GLuint programBodyID;
@@ -82,6 +85,7 @@ protected:
 	GLuint rightBorderVertexBufferID;
 	GLuint leftBorderVertexBufferID;
 	GLuint topBorderVertexBufferID;
+	GLuint middleTopBorderVertexBufferID;
 	GLuint bottomBorderVertexBufferID;
 	int numLines;
 	GLuint buffers[50];
@@ -94,6 +98,7 @@ protected:
 	GLuint rightBorderVertexArrayObjectID;
 	GLuint leftBorderVertexArrayObjectID;
 	GLuint topBorderVertexArrayObjectID;
+	GLuint middleTopBorderVertexArrayObjectID;
 	GLuint bottomBorderVertexArrayObjectID;
 
 	int newMousePosistionY;
@@ -113,6 +118,8 @@ protected:
 	void keyPressEvent(QKeyEvent *e);
 
 	int widthViewPort;
+
+	float shift = 0.0f;
 	
 public:
 	void callUpdate();

@@ -350,7 +350,7 @@ ShapeData ShapeGenerator::makeRightBorder(Data3D *data3D)
 
 	if (data3D->bordesAreSet())
 	{
-		// calculate new coordinates left border
+		// calculate new coordinates right border
 		float xBordMin = data3D->getMinXsurfPoint().x;
 		float xBordMax = data3D->getMaxXsurfPoint().x;
 		float yBordMin = data3D->getMinYsurfPoint().y;
@@ -519,7 +519,95 @@ ShapeData ShapeGenerator::makeTopBorder(Data3D *data3D)
 	return retShape;
 }
 
+ShapeData ShapeGenerator::makeMiddleTopBorder(Data3D *data3D)
+{
+	ShapeData retShape;
 
+	if (data3D->bordesAreSet())
+	{
+		// calculate new coordinates left border
+		float xBordMin = data3D->getMinXsurfPoint().x;
+		float xBordMax = data3D->getMaxXsurfPoint().x;
+		
+		float yBordMin = data3D->getMinYsurfPoint().y;
+		float yBordMax = data3D->getMaxYsurfPoint().y;
+
+
+
+		float positAdj = (xBordMax + xBordMin) / 4.0;
+
+		Vertex topBorder[] =
+		{
+			glm::vec3(xBordMax - positAdj, yBordMin, 0.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(xBordMax - positAdj, yBordMax, -2.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(xBordMax - positAdj, yBordMax, 0.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			//---------------------------------------
+
+			glm::vec3(xBordMax - positAdj, yBordMin, 0.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(xBordMax - positAdj, yBordMin, -2.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(xBordMax - positAdj, yBordMax, -2.0f),
+			glm::vec3(0.0f, 1.0f, 1.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+		};
+
+		retShape.numVertices = NUM_ARRAY_ELEMENTS(topBorder);
+		retShape.verticesWithNormal = new VertexWithNormal[retShape.numVertices];
+
+		memcpy(retShape.verticesWithNormal, topBorder, sizeof(topBorder));
+
+	}
+	else
+	{
+		Vertex topBorder[] =
+		{
+			glm::vec3(-1.0f, -1.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(-1.0f, 1.0f, -1.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+
+			glm::vec3(-1.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+
+			glm::vec3(-1.0f, -1.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(-1.0f, -1.0f, -1.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+
+			glm::vec3(-1.0f, 1.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+		};
+		retShape.numVertices = NUM_ARRAY_ELEMENTS(topBorder);
+		retShape.vertices = new Vertex[retShape.numVertices];
+
+		memcpy(retShape.vertices, topBorder, sizeof(topBorder));
+
+		GLushort indices[] = { 0, 1, 2 };
+		retShape.numIndices = NUM_ARRAY_ELEMENTS(indices);
+		retShape.indices = new GLushort[retShape.numIndices];
+
+		memcpy(retShape.indices, indices, sizeof(indices));
+	}
+
+	return retShape;
+}
 
 ShapeData ShapeGenerator::makeBottomBorder(Data3D *data3D)
 {

@@ -83,7 +83,7 @@ void Data3D::makeBorderCoordinats()
 	std::set<Vector3D>::reverse_iterator itmax = arrayOfUniqPoints.rbegin();
 	maxXsurfPoint = Vector3D((*itmax).x, (*itmax).y, (*itmax).z);
 
-	// перед поиском мксимального и минимального значения координат y
+	// перед поиском максимального и минимального значения координат y
 	// присвоим любые реальные значения, для простоты возмем координаты найденые выше 
 	minYsurfPoint = Vector3D((*itmin).x, (*itmin).y, (*itmin).z);
 	maxYsurfPoint = Vector3D((*itmin).x, (*itmin).y, (*itmin).z);
@@ -251,7 +251,7 @@ void Data3D::makeSectionsXNetPoints()
 
 	// сохраняем результаты в текстовый файл 
 
-	
+
 	std::wofstream fout(fname, std::ios::out); // | std::ios::binary);
 
 	//std::wofstream fout(L"C:\\tttttt.txt", std::ios::out); // | std::ios::binary);
@@ -274,123 +274,125 @@ void Data3D::makeSectionsXNetPoints()
 
 
 
-void Data3D::makeSectionsX()
+// функция вычисления на сколько нужно сдвинуть исследуюмый объект, чтобы он был по центру окна
+void Data3D::calculateShiftToCenter()
 {
-	//std::set<Vector3D>::iterator itmin = arrayOfUniqPoints.begin();
-	//minXsurfPoint = *itmin;
+	// возмем ширину на 3 уровнях, подсчитаем середину. 
+	// если две из них близки, то это и возмем это за середину.
+	// если все сильно разные, то возмем среднее значение
 
-	//std::set<Vector3D>::reverse_iterator itmax = arrayOfUniqPoints.rbegin();
-	//maxXsurfPoint = *itmax;
+	float lev1min = 0.0;
+	float lev1max = 0.0;
+
+	float lev2min = 0.0;
+	float lev2max = 0.0;
+
+	float lev3min = 0.0;
+	float lev3max = 0.0;
+
+
+	// задаем границы по оси x (вдоль позвоночника) по максимальным значениям модели
 
 	float minX = minXsurfPoint.x;
 	float maxX = maxXsurfPoint.x;
+	float minY = minYsurfPoint.y;
+	float maxY = maxYsurfPoint.y;
 
-	float sumMaxMin = std::abs(minX) + std::abs(maxX);
+	// находим обсолютную длину чтобы определить шаг между профилями
+	float sumMaxMin = std::abs(minY) + std::abs(maxY);
+	float stepHorizont = sumMaxMin / 6;							// шаг - четверть
 
-	const int number_horizonts = numOfHorizonts;
+	// задаем допуск который в три раза меньше расстосяния между точками поверхности 
+	float treshold = maxDiff / 2.0;
 
-	float stepHorizont = sumMaxMin / (number_horizonts - 1);
-	float treshold = maxDiff / 8.0;
-
-	//// make horizonts
-
-
+	// переменные для хранения значений величин определяющих корридор для профиля
 	float corridorTop;
 	float corridorBottom;
 
-	// make arrays for horizonts
-	for (int i = 0; i < number_horizonts; i++)
+
+	// выберам точки попадающие в корридор
+	for (int i = 1; i < 4; i++)
 	{
-		std::vector<Vector3D> horizLevelProfile;
-		horizontsPtr[i] = horizLevelProfile;
-		if (i == 0)
-		{
-			horizontLevel[i] = maxX;
-		}
-		else
-		{
-			horizontLevel[i] = maxX - stepHorizont * (i);
-		}
-	}
 
-	//rightYborder = minYsurfPoint.y;
-	//leftYborder = maxYsurfPoint.y;
-
-	for (std::set<Vector3D>::iterator it = arrayOfUniqPoints.begin(); it != arrayOfUniqPoints.end(); it++)
-	{
-		//minYsurfPoint = Vector3D(minXsurfPoint);
-		//maxYsurfPoint = Vector3D(maxXsurfPoint);
-
-		// apply borders
-		if ((*it).y < rightYborder || (*it).y > leftYborder)
-		{
-			continue;
-		}
-
-		if ((*it).x < bottomXborder || (*it).x > topXborder)
-		{
-			continue;
-		}
-
-		for (int i = 0; i < number_horizonts; i++)
+		for (std::vector<Vector3D>::iterator it = arrayOfVectors.begin(); it != arrayOfVectors.end(); it++)
 		{
 
-			corridorTop = horizontLevel[i] - treshold;
-			corridorBottom = horizontLevel[i] + treshold;
-
-			// select points for the current horizont level 
-
-			if (corridorTop < (*it).x && (*it).x < corridorBottom)
+			// apply borders
+			if ((*it).y < ((minY + stepHorizont * i) - treshold )|| (*it).y > ((minY + stepHorizont * i) + treshold))
 			{
-				if (horizontsPtr[i].size() == 0)
+				continue;
+			}
+
+			if (i == 1)
+			{
+				if (lev1min == 0.0 && lev1max == 0.0)
 				{
-					horizontsPtr[i].push_back(*it);
-					continue;
+					lev1min = (*it).x;
+					lev1max = (*it).x;
 				}
 
-				std::vector<Vector3D>::iterator itPoint = horizontsPtr[i].begin();
-				while (itPoint != horizontsPtr[i].end())
+				if ((*it).x <= lev1min)
 				{
-					if ((*it).y <= (*itPoint).y)
-					{
-						itPoint = horizontsPtr[i].insert(itPoint, (*it));
-						break;
-					}
-					else
-					{
-						itPoint++;
-						if (itPoint == horizontsPtr[i].end())
-						{
-							horizontsPtr[i].push_back(*it);
-							break;
-						}
-					}
+					lev1min = (*it).x;
+				}
+
+				if ((*it).x > lev1max)
+				{
+					lev1max = (*it).x;
+				}
+			}
+
+			if (i == 2)
+			{
+
+				if (lev2min == 0.0 && lev2max == 0.0)
+				{
+					lev2min = (*it).x;
+					lev2max = (*it).x;
+				}
+
+				if ((*it).x <= lev2min)
+				{
+					lev2min = (*it).x;
+				}
+
+				if ((*it).x > lev2max)
+				{
+					lev2max = (*it).x;
+				}
+			}
+
+			if (i == 3)
+			{
+
+				if (lev3min == 0.0 && lev3max == 0.0)
+				{
+					lev3min = (*it).x;
+					lev3max = (*it).x;
+				}
+
+				if ((*it).x <= lev3min)
+				{
+					lev3min = (*it).x;
+				}
+
+				if ((*it).x > lev3max)
+				{
+					lev3max = (*it).x;
 				}
 			}
 		}
-	}
 
-	//save horizonts to binary files
-
-	std::ofstream fout("horizontsX.txt", std::ios::out); // | std::ios::binary);
-
-	for (int i = 0; i < numOfHorizonts; i++)
-	{
-		size_t size = horizontsPtr[i].size();
-		//fout.write((char*)&size, sizeof(size));
-		fout << "Horizont number: " << i << "; Number of points: " << size;
-		fout << "----------------------------------------\n";
-
-		for (int t = 0; t < size; t++)
-		{
-			fout << ((horizontsPtr[i])[t]).x << ";" << ((horizontsPtr[i])[t]).y << ";" << ((horizontsPtr[i])[t]).z << std::endl;
-		}
-
-
-		//fout.write((char*)&(horizontsPtr[0])[0], (horizontsPtr[0]).size() * sizeof(Vector3D));
+		// decide where is the center
 
 	}
-	fout.close();
+
+	float center1 = (lev1min + lev1max) / 2.0;
+	float center2 = (lev2min + lev2max) / 2.0;
+	float center3 = (lev3min + lev3max) / 2.0;
+	
+	shiftToCenter = (center1 + center2 + center3) / 3;
+
 }
 
 
@@ -468,7 +470,7 @@ void Data3D::getTrianglesInArea()
 		float y;
 		float z;
 
-		// firgre out what the maximun distance between triangle points and use it for setting treshhold
+		// firgre out what the maximun distance between triangle points and use it for setting of treshhold
 
 		// take tri triangles to find the maximum
 		if (arrayOfVectors.size() > 5)
@@ -476,6 +478,7 @@ void Data3D::getTrianglesInArea()
 			Vector3D vector1 = arrayOfVectors.at(1);
 			Vector3D vector2 = arrayOfVectors.at(2);
 			Vector3D vector3 = arrayOfVectors.at(3);
+
 			// what is the maximum diference
 			float x1 = vector1.x;
 			float x2 = vector2.x;
@@ -561,27 +564,27 @@ void Data3D::getTrianglesInArea()
 }
 
 
-void Data3D::makeNetOfPoints2D()
-{
-	// make array of 3D points for area within borders
-
-	float x = bottomXborder;
-	float y = rightYborder;
-
-	maxDiff = 0.001;
-
-	while (x <= topXborder)
-	{
-		while (y <= leftYborder)
-		{
-			//arrayOfNetPoints.push_back(Vector3D(x, y, 0.0));
-			y = y + maxDiff;
-		}
-		x = x + maxDiff;
-		y = rightYborder;
-	}
-
-}
+//void Data3D::makeNetOfPoints2D()
+//{
+//	// make array of 3D points for area within borders
+//
+//	float x = bottomXborder;
+//	float y = rightYborder;
+//
+//	maxDiff = 0.001;
+//
+//	while (x <= topXborder)
+//	{
+//		while (y <= leftYborder)
+//		{
+//			//arrayOfNetPoints.push_back(Vector3D(x, y, 0.0));
+//			y = y + maxDiff;
+//		}
+//		x = x + maxDiff;
+//		y = rightYborder;
+//	}
+//
+//}
 
 
 float Data3D::sign(Vector3D p1, Vector3D p2, Vector3D p3)

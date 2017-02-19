@@ -235,49 +235,6 @@ void LeftGLWindow::installShaders()
 	if (!checkProgramStatus(programLineID))
 		return;
 
-	//glUseProgram(programLineID);
-
-
-
-
-
-	// install shaders for body
-
-	//GLuint vertexShaderBodyID = glCreateShader(GL_VERTEX_SHADER);
-	//GLuint fragmentShaderBodyID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	//const char* adapterBody[1];
-	//string tempBody = readShaderCode("VertexBodyShared.glsl");
-	//adapterBody[0] = tempBody.c_str();	// vertexShaderCode;
-	//glShaderSource(vertexShaderBodyID, 1, adapterBody, 0);		// 0 - OpenGL, you will figure out the size
-	//tempBody = readShaderCode("FragmentBodyShader.glsl");
-	//adapterBody[0] = tempBody.c_str();  // fragmentShadeCode
-	//glShaderSource(fragmentShaderBodyID, 1, adapterBody, 0);	// 0 - OpenGL, you will figure out the size
-
-	//glCompileShader(vertexShaderBodyID);
-	//glCompileShader(fragmentShaderBodyID);
-
-	//if (!checkShaderStatus(vertexShaderBodyID) || !checkShaderStatus(fragmentShaderBodyID))
-	//{
-	//	return;
-	//}
-
-	//programBodyID = glCreateProgram();
-
-	//glAttachShader(programBodyID, vertexShaderBodyID);
-	//glAttachShader(programBodyID, fragmentShaderBodyID);
-
-	//glLinkProgram(programBodyID);
-
-	//glDeleteShader(vertexShaderBodyID);
-	//glDeleteShader(fragmentShaderBodyID);
-
-	//if (!checkProgramStatus(programBodyID))
-	//	return;
-
-	//glUseProgram(programBodyID);
-
-
 }
 
 void LeftGLWindow::setupVertexArrays()
@@ -428,7 +385,7 @@ void LeftGLWindow::paintGL()
 	float camPosY3 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY2;	// right view will show bottom part of the body
 
 
-	for (int loop = 0; loop < 3; loop++)								// Loop To Draw Our 4 Views
+	for (int loop = 0; loop < 2; loop++)								// Loop To Draw Our 4 Views
 	{
 
 		// Set The Viewport To The Left. 
@@ -448,14 +405,6 @@ void LeftGLWindow::paintGL()
 		}
 
 		glUseProgram(programID);
-		//glm::mat4 translationMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -2.0f));
-		//glm::mat4 rotationMatrix = glm::rotate(glm::mat4(), -1.5707963268f, glm::vec3(0.0f, 0.0f, 1.0f));
-		//glm::mat4 projectionMatrix = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
-		//
-		//glm::mat4 fullTransfomMatrix = projectionMatrix * translationMatrix * scaleMatrix * rotationMatrix;
-		//
-		//GLint fullTransfomMatrixUniformLocation = glGetUniformLocation(programID, "fullTransfomMatrix");
-		//glUniformMatrix4fv(fullTransfomMatrixUniformLocation, 1, GL_FALSE, &fullTransfomMatrix[0][0]);
 
 		// SET UP LIGHT
 
@@ -467,30 +416,42 @@ void LeftGLWindow::paintGL()
 		glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
 		glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
 
+		glm::vec3 eye = glm::vec3(0.0, 0.0f, 0.0f);
+		glm::vec3 target = glm::vec3(0.0, 0.0f, -2.0f);
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+		glm::mat4 camera = glm::lookAt(eye, target, up);
+
 		if (showBody)
 		{
 			// BODY
 			glBindVertexArray(bodyVertexArrayObjectID);
 
-			float shiftBody = 0.0f;
+			float shiftCameraY = 0.0f;
+			float shiftCameraX = 0.0f;
 			modelDistance = -0.5f;
 
+			shiftCameraX = 0.0 - data3D->shiftToCenter;
+			
 			if (loop == 0)
 			{
-				shiftBody = 0.0f;
 				modelDistance = -0.5f;
 			}
+
 			if (loop == 1)
 			{
-				shiftBody = -0.1f;
+				eye = glm::vec3(shiftCameraX, +0.10f, 0.0f);
+				target = glm::vec3(shiftCameraX, +0.10f, -2.0f);
+				up = glm::vec3(0.0f, 1.0f, 0.0f);
+				camera = glm::lookAt(eye, target, up);
 				modelDistance = -0.2f;
 			}
 
-			glm::mat4 translationMatrixBody = glm::translate(glm::mat4(), glm::vec3(0.0f, shiftBody, modelDistance));
+			glm::mat4 translationMatrixBody = glm::translate(glm::mat4(), glm::vec3(0.0, 0.0, modelDistance));
 			glm::mat4 rotationMatrixBody = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBody = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * translationMatrixBody * scaleMatrix * rotationMatrixBody;
+			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * camera * translationMatrixBody * scaleMatrix * rotationMatrixBody;
 
 			GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
@@ -504,14 +465,12 @@ void LeftGLWindow::paintGL()
 			// RIGHT BORDER
 
 			glBindVertexArray(rightBorderVertexArrayObjectID);
-			//GLint ambientLightUniformLocationRightBorder = glGetUniformLocation(programID, "ambientLight");
-			//glUniform3fv(ambientLightUniformLocationRightBorder, 1, &ambientLight[0]);
 
 			glm::mat4 translationMatrixBodyRightBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + rightBorderShift, 0.0f, modelDistance));
 			glm::mat4 rotationMatrixBodyRightBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBodyRightBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder *
+			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder * camera *
 				translationMatrixBodyRightBorder * scaleMatrix * rotationMatrixBodyRightBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
@@ -528,7 +487,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 rotationMatrixBodyLeftBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBodyLeftBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBodyLeftBorder = projectionMatrixBodyLeftBorder *
+			glm::mat4 fullTransfomMatrixBodyLeftBorder = projectionMatrixBodyLeftBorder * camera *
 				translationMatrixBodyLeftBorder * scaleMatrix * rotationMatrixBodyLeftBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyLeftBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
@@ -546,7 +505,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 rotationMatrixBodyTopBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBodyTopBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBodyTopBorder = projectionMatrixBodyTopBorder *
+			glm::mat4 fullTransfomMatrixBodyTopBorder = projectionMatrixBodyTopBorder * camera *
 				translationMatrixBodyTopBorder * scaleMatrix * rotationMatrixBodyTopBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyTopBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
@@ -564,7 +523,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 rotationMatrixBodyBottomBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBodyBottomBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBodyBottomBorder = projectionMatrixBodyBottomBorder *
+			glm::mat4 fullTransfomMatrixBodyBottomBorder = projectionMatrixBodyBottomBorder * camera *
 				translationMatrixBodyBottomBorder * scaleMatrix * rotationMatrixBodyBottomBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyBottomBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
@@ -586,7 +545,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 rotationMatrixLines = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixLines = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixLines = projectionMatrixLines * translationMatrixLines * scaleMatrix * rotationMatrixLines;
+			glm::mat4 fullTransfomMatrixLines = projectionMatrixLines * camera * translationMatrixLines * scaleMatrix * rotationMatrixLines;
 
 			GLint fullTransfomMatrixUniformLocationLines = glGetUniformLocation(programLineID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationLines, 1, GL_FALSE, &fullTransfomMatrixLines[0][0]);
@@ -802,6 +761,7 @@ void LeftGLWindow::loadBodyData()
 
 	data3D->makeSetOfUniqPoints();
 	data3D->makeBorderCoordinats();
+	data3D->calculateShiftToCenter();
 }
 
 

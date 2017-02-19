@@ -55,14 +55,14 @@ public:
 	void insertVectorPoints(Vector3D newVector);
 	void makeSetOfUniqPoints();
 	void getTrianglesInArea();
-	void makeNetOfPoints2D();
+	//void makeNetOfPoints2D();
 	void makeNetOfPoints3D();
 	float sign(Vector3D p1, Vector3D p2, Vector3D p3);
 	bool pointInTriangle(Vector3D pt, Vector3D v1, Vector3D v2, Vector3D v3);
 	float makeEquationPlaneThroughPoints(Vector3D n, Vector3D surfP, Vector3D netP1, Vector3D netP2);
 	void makeSectionsXNetPoints();
 	Vector3D CalculateStartNetPointForTriangle(Vector3D testVec1, Vector3D testVec2, Vector3D testVec3);
-	void makeSectionsX();
+	// void makeSectionsX();
 	unsigned int getNumberOfPoints();
 	bool bordesAreSet();
 	void setBorderStatus(bool borderStatus);
@@ -74,6 +74,8 @@ public:
 	void setBorders(float leftYborder, float rightYborder, float topBorderShift, float bottomBorderShift);
 	void resetData();
 	void setInputFilePath(QString filePath);
+	void calculateShiftToCenter();
+	float shiftToCenter;
 	Data3D();
 	~Data3D();
 };

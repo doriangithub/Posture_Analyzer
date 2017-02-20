@@ -119,7 +119,8 @@ protected:
 
 	int widthViewPort;
 
-	float shift = 0.0f;
+	float shiftX = 0.0f;
+	float shiftY = 0.0f;
 	
 public:
 	void callUpdate();

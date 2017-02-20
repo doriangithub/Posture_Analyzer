@@ -299,7 +299,7 @@ void Data3D::calculateShiftToCenter()
 	float maxY = maxYsurfPoint.y;
 
 	// находим обсолютную длину чтобы определить шаг между профилями
-	float sumMaxMin = std::abs(minY) + std::abs(maxY);
+	sumMaxMin = std::abs(minY) + std::abs(maxY);
 	float stepHorizont = sumMaxMin / 6;							// шаг - четверть
 
 	// задаем допуск который в три раза меньше расстосяния между точками поверхности 

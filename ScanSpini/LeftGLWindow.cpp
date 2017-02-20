@@ -432,7 +432,10 @@ void LeftGLWindow::paintGL()
 			modelDistance = -0.5f;
 
 			shiftCameraX = 0.0 - data3D->shiftToCenter;
-			
+
+			// calculate shift up
+			float shiftUp = data3D->sumMaxMin / 9.0;
+
 			if (loop == 0)
 			{
 				modelDistance = -0.5f;
@@ -440,8 +443,8 @@ void LeftGLWindow::paintGL()
 
 			if (loop == 1)
 			{
-				eye = glm::vec3(shiftCameraX, +0.10f, 0.0f);
-				target = glm::vec3(shiftCameraX, +0.10f, -2.0f);
+				eye = glm::vec3(shiftCameraX - shiftX, 0.0f + shiftUp - shiftY, 0.0f);
+				target = glm::vec3(shiftCameraX - shiftX, 0.0f + shiftUp - shiftY, -2.0f);
 				up = glm::vec3(0.0f, 1.0f, 0.0f);
 				camera = glm::lookAt(eye, target, up);
 				modelDistance = -0.2f;
@@ -1106,7 +1109,19 @@ void LeftGLWindow::keyPressEvent(QKeyEvent *e)
 		repaint();
 		break;
 	case Qt::Key::Key_Right:
-		shift = shift + 0.001;
+		shiftX = shiftX + 0.001;
+		repaint();
+		break;
+	case Qt::Key::Key_Left:
+		shiftX = shiftX - 0.001;
+		repaint();
+		break;
+	case Qt::Key::Key_Up:
+		shiftY = shiftY + 0.001;
+		repaint();
+		break;
+	case Qt::Key::Key_Down:
+		shiftY = shiftY - 0.001;
 		repaint();
 		break;
 	}

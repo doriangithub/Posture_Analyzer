@@ -31,11 +31,6 @@ class Data3D
 	float mostLeftCoord = 0;
 	float mostRightCoord = 0;
 
-	Vector3D minXsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  minimal coordinate X fo Body
-	Vector3D maxXsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  maximal coordinate X fo Body
-	Vector3D minYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  minimal coordinate Y fo Body
-	Vector3D maxYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  maximal coordinate Y fo Body
-
 	float leftYborder;
 	float rightYborder;
 	float topXborder;
@@ -45,6 +40,12 @@ class Data3D
 	QString filePath;
 
 public:
+
+	Vector3D minXsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  minimal coordinate X fo Body
+	Vector3D maxXsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  maximal coordinate X fo Body
+	Vector3D minYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  minimal coordinate Y fo Body
+	Vector3D maxYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  maximal coordinate Y fo Body
+
 	//static const int MAX_NUMBER_HORIZONTS = 190;
 	//static const int getMaxNumberHorizonts();
 	void setNumOfHorizonts(int numHoriz);
@@ -76,6 +77,7 @@ public:
 	void setInputFilePath(QString filePath);
 	void calculateShiftToCenter();
 	float shiftToCenter;
+	float sumMaxMin;
 	Data3D();
 	~Data3D();
 };

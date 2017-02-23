@@ -354,7 +354,7 @@ void LeftGLWindow::paintGL()
 	int middleP2y = heightAll;
 
 	// right veiw port coordinates
-	int rightP1x = middleP2x;
+	int rightP1x = widthViewPort * 2;
 	int rightP1y = 0;
 	int rightP2x = widthViewPort;
 	int rightP2y = heightAll;
@@ -374,33 +374,29 @@ void LeftGLWindow::paintGL()
 	// set views for viewports
 	
 	// calculate how tall body is
-	//float xMin = data3D->getMinXsurfPoint().x;
-	//float xMax = data3D->getMaxXsurfPoint().x;
-
-	float yMin = data3D->getMinYsurfPoint().y;
-	float yMax = data3D->getMaxYsurfPoint().y;
-
-	float camPosY1 = ((abs(yMin) + abs(yMax)) / 3.0) / 2.0 + yMin;	// left view will show top part of the body
-	float camPosY2 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY1;	// middle view will show middle part of the body
-	float camPosY3 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY2;	// right view will show bottom part of the body
+	//float yMin = data3D->getMinYsurfPoint().y;
+	//float yMax = data3D->getMaxYsurfPoint().y;
+	//
+	//float camPosY1 = ((abs(yMin) + abs(yMax)) / 3.0) / 2.0 + yMin;	// left view will show top part of the body
+	//float camPosY2 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY1;	// middle view will show middle part of the body
+	//float camPosY3 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY2;	// right view will show bottom part of the body
 
 
-	for (int loop = 0; loop < 2; loop++)								// Loop To Draw Our 4 Views
+	for (int loop = 0; loop < 3; loop++)								// Loop To Draw Our 4 Views
 	{
-
-		// Set The Viewport To The Left. 
-
-		glViewport(leftP1x, leftP1y, leftP2x, leftP2y);
-		fovYinRadian = 0.3; // 0.6490658504f;
-
-		if (loop == 0)
+		if (loop == 0)		// Left Viewport
 		{
 			glViewport(leftP1x, leftP1y, leftP2x, leftP2y);
-			fovYinRadian = 0.3;
+			fovYinRadian = 0.3;	// 0.6490658504f;	
 		}
-		if (loop == 1)
+		if (loop == 1)		// Middle Viewport
 		{
 			glViewport(middleP1x, middleP1y, middleP2x, middleP2y);
+			fovYinRadian = 0.1;
+		}
+		if (loop == 2)		// Right Viewport
+		{
+			glViewport(rightP1x, rightP1y, rightP2x, rightP2y);
 			fovYinRadian = 0.1;
 		}
 
@@ -416,6 +412,7 @@ void LeftGLWindow::paintGL()
 		glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
 		glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
 
+		// set up camera
 		glm::vec3 eye = glm::vec3(0.0, 0.0f, 0.0f);
 		glm::vec3 target = glm::vec3(0.0, 0.0f, -2.0f);
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -424,7 +421,7 @@ void LeftGLWindow::paintGL()
 
 		if (showBody)
 		{
-			// BODY
+			// DRAW BODY
 			glBindVertexArray(bodyVertexArrayObjectID);
 
 			float shiftCameraY = 0.0f;
@@ -433,28 +430,42 @@ void LeftGLWindow::paintGL()
 
 			shiftCameraX = 0.0 - data3D->shiftToCenter;
 
-			// calculate shift up
+			// calculate how much shift camera up
 			float shiftUp = data3D->sumMaxMin / 9.0;
 
-			if (loop == 0)
+			if (loop == 0)		// Left Viewport
 			{
-				modelDistance = -0.5f;
+				//modelDistance = -0.5f;
 			}
 
-			if (loop == 1)
+			if (loop == 1)		// Middle Viewport
 			{
-				eye = glm::vec3(shiftCameraX - shiftX, 0.0f + shiftUp - shiftY, 0.0f);
-				target = glm::vec3(shiftCameraX - shiftX, 0.0f + shiftUp - shiftY, -2.0f);
+				//modelDistance = -0.2f;
+
+				// for middle view shifting camera to the neck area
+				eye = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f + shiftUp - shiftYByKeyPress, 0.0f);
+				target = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f + shiftUp - shiftYByKeyPress, modelDistance);
 				up = glm::vec3(0.0f, 1.0f, 0.0f);
 				camera = glm::lookAt(eye, target, up);
-				modelDistance = -0.2f;
+			}
+
+			if (loop == 2)		// Right Viewport
+			{
+				//modelDistance = -0.2f;
+
+				// for middle view shifting camera to the neck area
+				eye = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp/2.0) - shiftYByKeyPress, 0.0f);
+				target = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp/2.0) - shiftYByKeyPress, modelDistance);
+				up = glm::vec3(0.0f, 1.0f, 0.0f);
+				camera = glm::lookAt(eye, target, up);
 			}
 
 			glm::mat4 translationMatrixBody = glm::translate(glm::mat4(), glm::vec3(0.0, 0.0, modelDistance));
 			glm::mat4 rotationMatrixBody = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBody = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * camera * translationMatrixBody * scaleMatrix * rotationMatrixBody;
+			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * camera * translationMatrixBody
+											   * scaleMatrix * rotationMatrixBody;
 
 			GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
@@ -469,12 +480,15 @@ void LeftGLWindow::paintGL()
 
 			glBindVertexArray(rightBorderVertexArrayObjectID);
 
-			glm::mat4 translationMatrixBodyRightBorder = glm::translate(glm::mat4(), glm::vec3(0.0f + rightBorderShift, 0.0f, modelDistance));
+			glm::mat4 translationMatrixBodyRightBorder = glm::translate(glm::mat4(),
+														    glm::vec3(0.0f + rightBorderShift, 0.0f, modelDistance));
+
 			glm::mat4 rotationMatrixBodyRightBorder = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixBodyRightBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder * camera *
-				translationMatrixBodyRightBorder * scaleMatrix * rotationMatrixBodyRightBorder;
+			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder 
+														  * camera * translationMatrixBodyRightBorder * scaleMatrix
+				                                          * rotationMatrixBodyRightBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyRightBorder, 1, GL_FALSE,
@@ -1109,19 +1123,19 @@ void LeftGLWindow::keyPressEvent(QKeyEvent *e)
 		repaint();
 		break;
 	case Qt::Key::Key_Right:
-		shiftX = shiftX + 0.001;
+		shiftXByKeyPress = shiftXByKeyPress + 0.001;
 		repaint();
 		break;
 	case Qt::Key::Key_Left:
-		shiftX = shiftX - 0.001;
+		shiftXByKeyPress = shiftXByKeyPress - 0.001;
 		repaint();
 		break;
 	case Qt::Key::Key_Up:
-		shiftY = shiftY + 0.001;
+		shiftYByKeyPress = shiftYByKeyPress + 0.001;
 		repaint();
 		break;
 	case Qt::Key::Key_Down:
-		shiftY = shiftY - 0.001;
+		shiftYByKeyPress = shiftYByKeyPress - 0.001;
 		repaint();
 		break;
 	}

@@ -119,8 +119,8 @@ protected:
 
 	int widthViewPort;
 
-	float shiftX = 0.0f;
-	float shiftY = 0.0f;
+	float shiftXByKeyPress = 0.0f;
+	float shiftYByKeyPress = 0.0f;
 	
 public:
 	void callUpdate();

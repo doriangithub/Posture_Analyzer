@@ -338,66 +338,109 @@ void LeftGLWindow::paintGL()
 	int widthAll = width();
 	int heightAll = height();
 
-	// devide OpenGl screen in 3 view ports
-	widthViewPort = widthAll / 3;
+	//       devide in 4 view ports
+	//
+	//   ################################
+	//   #       #       #      3       # 
+	//   #       #       #              # 
+	//   #   1   #   2   ################ 
+	//   #       #       #      4       # 
+	//   #       #       #              # 
+	//   ################################
 
-	// left veiw port coordinates
-	int leftP1x = 0;
-	int leftP1y = 0;
-	int leftP2x = widthViewPort;
-	int leftP2y = heightAll;
 
-	// middle veiw port coordinates
-	int middleP1x = widthViewPort;
-	int middleP1y = 0;
-	int middleP2x = widthViewPort;
-	int middleP2y = heightAll;
+	int view1coordX = 0;
+	int view1coordY = 0;
+	int view1width = widthAll / 4;
+	int view1hight = heightAll;
 
-	// right veiw port coordinates
-	int rightP1x = widthViewPort * 2;
-	int rightP1y = 0;
-	int rightP2x = widthViewPort;
-	int rightP2y = heightAll;
+	int view2coordX = view1width;
+	int view2coordY = 0;
+	int view2width = view1width;
+	int view2hight = heightAll;
+
+	int view3coordX = view1width + view1width;
+	int view3coordY = heightAll / 2;
+	int view3width = view3coordX;
+	int view3hight = view3coordY;
+
+	int view4coordX = view3coordX;
+	int view4coordY = 0;
+	int view4width = view3coordX;
+	int view4hight = view3coordY;
 
 	// aspect ratio
-	aspectRatio = (1.0/3.0) / 1.0;
-	glm::mat4 scaleMatrix;
-	if (aspectRatio > 1.0)
+	aspectRatioView1 = (1.0/4.0);
+	aspectRatioView3 = (3.0/2.0);
+
+	glm::mat4 scaleMatrixViewState;
+	glm::mat4 scaleMatrixView1;
+	if (aspectRatioView1 > 1.0)
 	{
-		scaleMatrix = glm::scale(glm::mat4(), glm::vec3(1.0f/ aspectRatio, 1.0f, 1.0f));
+		scaleMatrixView1 = glm::scale(glm::mat4(), glm::vec3(1.0f/ aspectRatioView1, 1.0f, 1.0f));
 	}
 	else
 	{
-		scaleMatrix = glm::scale(glm::mat4(), glm::vec3(1.0f, aspectRatio, 1.0f));
+		scaleMatrixView1 = glm::scale(glm::mat4(), glm::vec3(1.0f, aspectRatioView1, 1.0f));
 	}
 
-	// set views for viewports
-	
-	// calculate how tall body is
-	//float yMin = data3D->getMinYsurfPoint().y;
-	//float yMax = data3D->getMaxYsurfPoint().y;
-	//
-	//float camPosY1 = ((abs(yMin) + abs(yMax)) / 3.0) / 2.0 + yMin;	// left view will show top part of the body
-	//float camPosY2 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY1;	// middle view will show middle part of the body
-	//float camPosY3 = ((abs(yMin) + abs(yMax)) / 3.0)  + camPosY2;	// right view will show bottom part of the body
-
-
-	for (int loop = 0; loop < 3; loop++)								// Loop To Draw Our 4 Views
+	glm::mat4 scaleMatrixView2;
+	if (aspectRatioView3 > 1.0)
 	{
-		if (loop == 0)		// Left Viewport
+		scaleMatrixView2 = glm::scale(glm::mat4(), glm::vec3(1.0f / aspectRatioView3, 1.0f, 1.0f));
+	}
+	else
+	{
+		scaleMatrixView2 = glm::scale(glm::mat4(), glm::vec3(1.0f, aspectRatioView3, 1.0f));
+	}
+
+	// Make active viewport for manual control of camera
+	// active viewport selected by mouse pointer
+	
+	if (view1coordX <= mousePressPositionX < view1width)
+	{
+		numberOfViewport = 1;
+	}
+	if (view2coordX <= mousePressPositionX < view1width * 2)
+	{
+		numberOfViewport = 2;
+	}
+	if ( (view1width * 2) <= mousePressPositionX < widthAll && (view3coordY) <= mousePressPositionY < heightAll)
+	{
+		numberOfViewport = 3;
+	}
+	if ((view1width * 2) <= mousePressPositionX < widthAll && (view4coordY) <= mousePressPositionY < (heightAll /2))
+	{
+		numberOfViewport = 4;
+	}
+
+	for (int loop = 0; loop < 4; loop++)								// Loop To Draw Our 4 Views
+	{
+		// set current viewport
+		if (loop == 0)		// Viewport 1
 		{
-			glViewport(leftP1x, leftP1y, leftP2x, leftP2y);
+			glViewport(view1coordX, view1coordY, view1width, view1hight);
 			fovYinRadian = 0.3;	// 0.6490658504f;	
+			scaleMatrixViewState = scaleMatrixView1;
 		}
-		if (loop == 1)		// Middle Viewport
+		if (loop == 1)		// Viewport 2
 		{
-			glViewport(middleP1x, middleP1y, middleP2x, middleP2y);
+			glViewport(view2coordX, view2coordY, view2width, view2hight);
 			fovYinRadian = 0.1;
+			scaleMatrixViewState = scaleMatrixView1;
 		}
-		if (loop == 2)		// Right Viewport
+		if (loop == 2)		// Viewport 3
 		{
-			glViewport(rightP1x, rightP1y, rightP2x, rightP2y);
+			glViewport(view3coordX, view3coordY, view3width, view3hight);
 			fovYinRadian = 0.1;
+			scaleMatrixViewState = scaleMatrixView2;
+		}
+
+		if (loop == 3)		// Viewport 4
+		{
+			glViewport(view4coordX, view4coordY, view4width, view4hight);
+			fovYinRadian = 0.1;
+			scaleMatrixViewState = scaleMatrixView2;
 		}
 
 		glUseProgram(programID);
@@ -412,7 +455,8 @@ void LeftGLWindow::paintGL()
 		glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
 		glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
 
-		// set up camera
+		// SET UP CAMERA
+
 		glm::vec3 eye = glm::vec3(0.0, 0.0f, 0.0f);
 		glm::vec3 target = glm::vec3(0.0, 0.0f, -2.0f);
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -433,15 +477,13 @@ void LeftGLWindow::paintGL()
 			// calculate how much shift camera up
 			float shiftUp = data3D->sumMaxMin / 9.0;
 
-			if (loop == 0)		// Left Viewport
+			if (loop == 0)		//  Viewport 1
 			{
 				//modelDistance = -0.5f;
 			}
 
-			if (loop == 1)		// Middle Viewport
+			if (loop == 1)		//  Viewport 2
 			{
-				//modelDistance = -0.2f;
-
 				// for middle view shifting camera to the neck area
 				eye = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f + shiftUp - shiftYByKeyPress, 0.0f);
 				target = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f + shiftUp - shiftYByKeyPress, modelDistance);
@@ -449,13 +491,20 @@ void LeftGLWindow::paintGL()
 				camera = glm::lookAt(eye, target, up);
 			}
 
-			if (loop == 2)		// Right Viewport
+			if (loop == 2)		//  Viewport 3
 			{
-				//modelDistance = -0.2f;
-
-				// for middle view shifting camera to the neck area
+				// for right view shifting camera to the neck area
 				eye = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp/2.0) - shiftYByKeyPress, 0.0f);
 				target = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp/2.0) - shiftYByKeyPress, modelDistance);
+				up = glm::vec3(0.0f, 1.0f, 0.0f);
+				camera = glm::lookAt(eye, target, up);
+			}
+
+			if (loop == 3)		//  Viewport 4
+			{
+				// for right view shifting camera to the neck area
+				eye = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp / 2.0) - shiftYByKeyPress, 0.0f);
+				target = glm::vec3(shiftCameraX - shiftXByKeyPress, 0.0f - (shiftUp / 2.0) - shiftYByKeyPress, modelDistance);
 				up = glm::vec3(0.0f, 1.0f, 0.0f);
 				camera = glm::lookAt(eye, target, up);
 			}
@@ -465,7 +514,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 projectionMatrixBody = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
 			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * camera * translationMatrixBody
-											   * scaleMatrix * rotationMatrixBody;
+											   * scaleMatrixViewState * rotationMatrixBody;
 
 			GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
@@ -487,7 +536,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 projectionMatrixBodyRightBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
 			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder 
-														  * camera * translationMatrixBodyRightBorder * scaleMatrix
+														  * camera * translationMatrixBodyRightBorder * scaleMatrixViewState
 				                                          * rotationMatrixBodyRightBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
@@ -505,7 +554,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 projectionMatrixBodyLeftBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
 			glm::mat4 fullTransfomMatrixBodyLeftBorder = projectionMatrixBodyLeftBorder * camera *
-				translationMatrixBodyLeftBorder * scaleMatrix * rotationMatrixBodyLeftBorder;
+				translationMatrixBodyLeftBorder * scaleMatrixViewState * rotationMatrixBodyLeftBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyLeftBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyLeftBorder, 1, GL_FALSE,
@@ -523,7 +572,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 projectionMatrixBodyTopBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
 			glm::mat4 fullTransfomMatrixBodyTopBorder = projectionMatrixBodyTopBorder * camera *
-				translationMatrixBodyTopBorder * scaleMatrix * rotationMatrixBodyTopBorder;
+				translationMatrixBodyTopBorder * scaleMatrixViewState * rotationMatrixBodyTopBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyTopBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyTopBorder, 1, GL_FALSE,
@@ -541,7 +590,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 projectionMatrixBodyBottomBorder = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
 			glm::mat4 fullTransfomMatrixBodyBottomBorder = projectionMatrixBodyBottomBorder * camera *
-				translationMatrixBodyBottomBorder * scaleMatrix * rotationMatrixBodyBottomBorder;
+				translationMatrixBodyBottomBorder * scaleMatrixViewState * rotationMatrixBodyBottomBorder;
 
 			GLint fullTransfomMatrixUniformLocationBodyBottomBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyBottomBorder, 1, GL_FALSE,
@@ -562,7 +611,8 @@ void LeftGLWindow::paintGL()
 			glm::mat4 rotationMatrixLines = glm::rotate(glm::mat4(), roatationInRadian, glm::vec3(0.0f, 0.0f, 1.0f));
 			glm::mat4 projectionMatrixLines = glm::perspective(fovYinRadian, ((float)width()) / height(), 0.1f, 10.0f);
 
-			glm::mat4 fullTransfomMatrixLines = projectionMatrixLines * camera * translationMatrixLines * scaleMatrix * rotationMatrixLines;
+			glm::mat4 fullTransfomMatrixLines = projectionMatrixLines * camera * translationMatrixLines *
+																scaleMatrixViewState * rotationMatrixLines;
 
 			GLint fullTransfomMatrixUniformLocationLines = glGetUniformLocation(programLineID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationLines, 1, GL_FALSE, &fullTransfomMatrixLines[0][0]);

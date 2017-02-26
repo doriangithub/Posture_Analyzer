@@ -107,7 +107,8 @@ protected:
 	int mousePressPositionX;
 	int mousePressPositionY;
 
-	float aspectRatio;
+	float aspectRatioView1;
+	float aspectRatioView3;
 
 	void mouseMoveEvent(QMouseEvent* e);
 	void mousePressEvent(QMouseEvent *e);
@@ -121,6 +122,8 @@ protected:
 
 	float shiftXByKeyPress = 0.0f;
 	float shiftYByKeyPress = 0.0f;
+
+	int numberOfViewport = 1;
 	
 public:
 	void callUpdate();

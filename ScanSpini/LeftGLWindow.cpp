@@ -335,8 +335,8 @@ void LeftGLWindow::paintGL()
 {
 	glClearColor(0.0f, 0.3f, 0.7f, 1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	int widthAll = width();
-	int heightAll = height();
+	widthAll = width();
+	heightAll = height();
 
 	//       devide in 4 view ports
 	//
@@ -349,25 +349,25 @@ void LeftGLWindow::paintGL()
 	//   ################################
 
 
-	int view1coordX = 0;
-	int view1coordY = 0;
-	int view1width = widthAll / 4;
-	int view1hight = heightAll;
+	view1coordX = 0;
+	view1coordY = 0;
+	view1width = widthAll / 4;
+	view1hight = heightAll;
 
-	int view2coordX = view1width;
-	int view2coordY = 0;
-	int view2width = view1width;
-	int view2hight = heightAll;
+	view2coordX = view1width;
+	view2coordY = 0;
+	view2width = view1width;
+	view2hight = heightAll;
 
-	int view3coordX = view1width + view1width;
-	int view3coordY = heightAll / 2;
-	int view3width = view3coordX;
-	int view3hight = view3coordY;
+	view3coordX = view1width + view1width;
+	view3coordY = heightAll / 2;
+	view3width = view3coordX;
+	view3hight = view3coordY;
 
-	int view4coordX = view3coordX;
-	int view4coordY = 0;
-	int view4width = view3coordX;
-	int view4hight = view3coordY;
+	view4coordX = view3coordX;
+	view4coordY = 0;
+	view4width = view3coordX;
+	view4hight = view3coordY;
 
 	// aspect ratio
 	aspectRatioView1 = (1.0/4.0);
@@ -397,22 +397,13 @@ void LeftGLWindow::paintGL()
 	// Make active viewport for manual control of camera
 	// active viewport selected by mouse pointer
 	
-	if (view1coordX <= mousePressPositionX < view1width)
-	{
-		numberOfViewport = 1;
-	}
-	if (view2coordX <= mousePressPositionX < view1width * 2)
-	{
-		numberOfViewport = 2;
-	}
-	if ( (view1width * 2) <= mousePressPositionX < widthAll && (view3coordY) <= mousePressPositionY < heightAll)
-	{
-		numberOfViewport = 3;
-	}
-	if ((view1width * 2) <= mousePressPositionX < widthAll && (view4coordY) <= mousePressPositionY < (heightAll /2))
-	{
-		numberOfViewport = 4;
-	}
+	std::cout << "*** view4coordX = " << view4coordX << std::endl;
+	std::cout << "*** view4coordY = " << view4coordY << std::endl;
+	std::cout << "*** view4width = " << view4width << std::endl;
+	std::cout << "*** view4hight = " << view4hight << std::endl;
+	std::cout << "***************************************************" << std::endl;
+
+
 
 	for (int loop = 0; loop < 4; loop++)								// Loop To Draw Our 4 Views
 	{
@@ -435,7 +426,6 @@ void LeftGLWindow::paintGL()
 			fovYinRadian = 0.1;
 			scaleMatrixViewState = scaleMatrixView2;
 		}
-
 		if (loop == 3)		// Viewport 4
 		{
 			glViewport(view4coordX, view4coordY, view4width, view4hight);
@@ -1044,6 +1034,8 @@ void LeftGLWindow::mousePressEvent(QMouseEvent *e)
 		mousePressPositionY = e->y();
 		std::cout << "posX = " << mousePressPositionX << endl;
 		std::cout << "posY = " << mousePressPositionY << endl;
+
+		setActiveViewPort(mousePressPositionX, mousePressPositionY);
 	}
 	else if (e->button() == Qt::RightButton)   // Right button...
 	{
@@ -1191,4 +1183,30 @@ void LeftGLWindow::keyPressEvent(QKeyEvent *e)
 	}
 	data3D->setBorders(leftBorderShift, rightBorderShift, topBorderShift, bottomBorderShift);
 	std::cout << "-- rightBorderShift = " << rightBorderShift << endl;
+}
+
+void LeftGLWindow::setActiveViewPort(int mousePressPositionX, int mousePressPositionY)
+{
+	if (view1coordX <= mousePressPositionX && mousePressPositionX < view1width )
+	{
+		activeViewport = 1;
+		std::cout << "*** Viewport 1" << std::endl;
+	}
+	if (view2coordX <= mousePressPositionX && mousePressPositionX < view1width * 2 )
+	{
+		activeViewport = 2;
+		std::cout << "*** Viewport 2" << std::endl;
+	}
+	if ((view1width * 2) <= mousePressPositionX && mousePressPositionX < widthAll 
+		    && (view4coordY) <= mousePressPositionY && mousePressPositionY < (heightAll /2))
+	{
+		activeViewport = 4;
+		std::cout << "*** Viewport 3" << std::endl;
+	}
+	if ((view1width * 2) <= mousePressPositionX && mousePressPositionX < widthAll
+		&& (view3coordY) <= mousePressPositionY && mousePressPositionY < heightAll)
+	{
+		activeViewport = 3;
+		std::cout << "*** Viewport 4" << std::endl;
+	}
 }

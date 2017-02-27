@@ -123,8 +123,33 @@ protected:
 	float shiftXByKeyPress = 0.0f;
 	float shiftYByKeyPress = 0.0f;
 
-	int numberOfViewport = 1;
+	int activeViewport = 1;
+
+	// viewports coordinates
+	int view1coordX;
+	int view1coordY;
+	int view1width;
+	int view1hight;
+
+	int view2coordX;
+	int view2coordY;
+	int view2width;
+	int view2hight;
+
+	int view3coordX;
+	int view3coordY;
+	int view3width;
+	int view3hight;
+
+	int view4coordX;
+	int view4coordY;
+	int view4width;
+	int view4hight;
+
+	void setActiveViewPort(int mousePressPositionX, int mousePressPositionY);
 	
+	int widthAll;
+	int heightAll;
 public:
 	void callUpdate();
 };

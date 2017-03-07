@@ -65,6 +65,7 @@ void LeftGLWindow::initializeGL()
 	installShaders();
 	loadRightBorder();
 	loadLeftBorder();
+	installBorderShaders();
 }
 
 
@@ -242,7 +243,15 @@ void LeftGLWindow::setupVertexArrays()
 	glGenVertexArrays(1, &triangleVertexArrayObjectID);
 	glGenVertexArrays(1, &bodyVertexArrayObjectID);
 	glGenVertexArrays(1, &lineVertexArrayObjectID);
+	glGenVertexArrays(1, &cubeVertexArrayObjectID);
 
+	// CUBE
+	glBindVertexArray(cubeVertexArrayObjectID);
+	glEnableVertexAttribArray(0);  // vertices
+	glEnableVertexAttribArray(1);  // color
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBufferID);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (char*)(sizeof(float) * 3));
 
 	// LOGO
 	glBindVertexArray(triangleVertexArrayObjectID);
@@ -453,6 +462,29 @@ void LeftGLWindow::paintGL()
 
 		glm::mat4 camera = glm::lookAt(eye, target, up);
 
+		glUseProgram(programTrangleID);
+
+		if (showTriangl)
+		{
+			// DRAW TRIANGL
+			glBindVertexArray(triangleVertexArrayObjectID);
+
+			glm::mat4 translationMatrixTriangl = glm::translate(glm::mat4(), glm::vec3(0.0, 0.0, 0.0));
+			glm::mat4 rotationMatrixTriangl = glm::rotate(glm::mat4(), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 projectionMatrixTriangl = glm::ortho(-1, 1, -1, 1, -2, 2);
+
+			glm::mat4 fullTransfomMatrixTriangl = projectionMatrixTriangl * camera * translationMatrixTriangl
+				* scaleMatrixViewState * rotationMatrixTriangl;
+
+			GLint fullTransfomMatrixUniformLocationTriangle = glGetUniformLocation(programID, "fullTransfomMatrix");
+			glUniformMatrix4fv(fullTransfomMatrixUniformLocationTriangle, 1, GL_FALSE, &fullTransfomMatrixTriangl[0][0]);
+
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		}
+
+		glUseProgram(programID);
+
 		if (showBody)
 		{
 			// DRAW BODY
@@ -470,6 +502,9 @@ void LeftGLWindow::paintGL()
 			if (loop == 0)		//  Viewport 1
 			{
 				//modelDistance = -0.5f;
+
+				 
+
 			}
 
 			if (loop == 1)		//  Viewport 2
@@ -506,6 +541,8 @@ void LeftGLWindow::paintGL()
 			glm::mat4 fullTransfomMatrixBody = projectionMatrixBody * camera * translationMatrixBody
 											   * scaleMatrixViewState * rotationMatrixBody;
 
+			//glm::mat4() and glm::mat4(1.0) build identity matrices.
+
 			GLint fullTransfomMatrixUniformLocationBody = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBody, 1, GL_FALSE, &fullTransfomMatrixBody[0][0]);
 
@@ -528,7 +565,7 @@ void LeftGLWindow::paintGL()
 			glm::mat4 fullTransfomMatrixBodyRightBorder = projectionMatrixBodyRightBorder 
 														  * camera * translationMatrixBodyRightBorder * scaleMatrixViewState
 				                                          * rotationMatrixBodyRightBorder;
-
+			
 			GLint fullTransfomMatrixUniformLocationBodyRightBorder = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationBodyRightBorder, 1, GL_FALSE,
 				&fullTransfomMatrixBodyRightBorder[0][0]);
@@ -995,6 +1032,28 @@ void LeftGLWindow::loadBottomBorder()
 }
 
 
+void LeftGLWindow::loadCube()
+{
+	glBindVertexArray(cubeVertexArrayObjectID);
+
+	glGenBuffers(1, &cubeVertexBufferID);
+	glBindBuffer(GL_ARRAY_BUFFER, cubeVertexBufferID);
+
+	GLsizeiptr allLinesBuffSize = 0;
+	ShapeData cubeShape = ShapeGenerator::makeCube();
+
+	numVerticesCube = cubeShape.numVertices;
+	cubeBuffSize = cubeShape.vertexPositionBufferSize();
+
+	glBufferData(GL_ARRAY_BUFFER,cubeShape.vertexBufferSize(), cubeShape.verticesWithNormal, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, (char*)(sizeof(float) * 6));
+
+}
+
+
 void LeftGLWindow::callUpdate()
 {
 	installBodyShaders();
@@ -1006,6 +1065,7 @@ void LeftGLWindow::callUpdate()
 	loadLeftBorder();
 	loadTopBorder();
 	loadBottomBorder();
+	loadCube();
 	update();
 }
 

@@ -27,6 +27,7 @@ public:
 	void loadMiddleTopBorder();
 	void loadMiddleBottomBorder();
 	void loadBottomBorder();
+	void loadCube();
 
 protected:
 
@@ -60,6 +61,7 @@ protected:
 	bool showBody = true;
 	bool showBorders = true;
 	bool showLines = true;
+	bool showTriangl = true;
 
 	GLuint programID;
 	GLuint programBodyID;
@@ -76,10 +78,13 @@ protected:
 	GLuint numVerticesTopBorder;
 	GLuint numVerticesBottomBorder;
 	GLuint rightBorderBuffSize;
+	GLuint numVerticesCube;
+	GLuint cubeBuffSize;
 	
 	GLuint triangleVertexBufferID;
 	GLuint bodyVertexBufferID;
 	GLuint lineVertexBufferID;
+	GLuint cubeVertexBufferID;
 	GLuint linesVertexBufferID;
 	GLuint manyLinesVertexBufferID;
 	GLuint rightBorderVertexBufferID;
@@ -100,6 +105,8 @@ protected:
 	GLuint topBorderVertexArrayObjectID;
 	GLuint middleTopBorderVertexArrayObjectID;
 	GLuint bottomBorderVertexArrayObjectID;
+
+	GLuint cubeVertexArrayObjectID;
 
 	int newMousePosistionY;
 	int oldmousePositionY;

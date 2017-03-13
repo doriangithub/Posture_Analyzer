@@ -103,6 +103,17 @@ void Data3D::makeBorderCoordinats()
 		{
 			maxYsurfPoint = Vector3D((*it).x, (*it).y, (*it).z);
 		}
+
+		if ((*it).z > maxZ)
+		{
+			maxZ = (*it).z;
+		}
+
+		if ((*it).z < minZ)
+		{
+			minZ = (*it).z;
+		}
+
 	}
 	setBorderStatus(true);
 }
@@ -750,8 +761,49 @@ float Data3D::makeEquationPlaneThroughPoints(Vector3D n, Vector3D surfP, Vector3
 	return z;
 }
 
+
 void Data3D::setInputFilePath(QString filePath)
 {
 	this->filePath = filePath;
 }
 
+
+void Data3D::findMaxMinZvalue()
+{
+	//this->minZ = -2.0;
+	//this->maxZ = 3.0;
+
+	// масссив arrayOfUniqPoints содержит уникальные 3D точки поверхности 
+	std::set<Vector3D>::iterator itmin = arrayOfUniqPoints.begin();
+
+	// перед поиском максимального и минимального значения координат Z
+	// присвоим любые реальные значения, для простоты возмем координаты найденые выше 
+
+	this-> minZ = this->maxZ = (*itmin).z;
+
+	// цикл поиска минимальных и максимальных значений z
+	for (std::set<Vector3D>::iterator it = arrayOfUniqPoints.begin(); it != arrayOfUniqPoints.end(); it++)
+	{
+		if ((*it).z > maxZ)
+		{
+			maxZ = (*it).z;
+		}
+
+		if ((*it).z < minZ)
+		{
+			minZ = (*it).z;
+		}
+	}
+}
+
+
+float Data3D::getMinimalZValue()
+{
+	return this->minZ;
+}
+
+
+float Data3D::getMaximalZValue()
+{
+	return this->maxZ;
+}

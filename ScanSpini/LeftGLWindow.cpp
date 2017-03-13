@@ -77,6 +77,10 @@ void LeftGLWindow::displayData()
 
 	int sizeOfScannedData = data3D->getArrayofVectors().size();
 
+	//set minimal and maximum z value of scanned surface
+	minZ = data3D->getMinimalZValue();
+	maxZ = data3D->getMaximalZValue();
+
 	if (sizeOfScannedData > 0)
 	{
 		// set up camera for scaned body
@@ -453,6 +457,12 @@ void LeftGLWindow::paintGL()
 		GLint ambientLightUniformLocation = glGetUniformLocation(programID, "ambientLight");
 		glm::vec3 ambientLight(1.0f, 1.0f, 1.0f);
 		glUniform3fv(ambientLightUniformLocation, 1, &ambientLight[0]);
+
+		// SET max and min Z of the body
+		GLint minZUniformLocation = glGetUniformLocation(programID, "minZ");
+		GLint maxZUniformLocation = glGetUniformLocation(programID, "maxZ");
+		glUniform1f(minZUniformLocation, this->minZ);
+		glUniform1f(maxZUniformLocation, this->maxZ);
 
 		// SET UP CAMERA
 
@@ -856,6 +866,10 @@ void LeftGLWindow::loadBodyData()
 	data3D->makeSetOfUniqPoints();
 	data3D->makeBorderCoordinats();
 	data3D->calculateShiftToCenter();
+	data3D->findMaxMinZvalue();
+	this->maxZ = data3D->getMaximalZValue();
+	this->minZ = data3D->getMinimalZValue();
+
 }
 
 
@@ -1065,7 +1079,7 @@ void LeftGLWindow::callUpdate()
 	loadLeftBorder();
 	loadTopBorder();
 	loadBottomBorder();
-	loadCube();
+	//loadCube();
 	update();
 }
 

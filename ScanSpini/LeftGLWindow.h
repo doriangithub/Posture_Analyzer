@@ -63,6 +63,10 @@ protected:
 	bool showLines = true;
 	bool showTriangl = true;
 
+	//for coloring body
+	float minZ;
+	float maxZ;
+
 	GLuint programID;
 	GLuint programBodyID;
 	GLuint programLineID;

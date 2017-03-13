@@ -27,6 +27,7 @@ SettingsControls::SettingsControls(Data3D *data3D, GraphicalControls *graphicalC
 	numSectionHorizLabel->setAlignment(Qt::AlignLeft);
 	numSectionHorizLabel->setAlignment(Qt::AlignVCenter);
 	numSectionHorizLabel->setText("Number of horizontal sections:");
+
 	//numSectionHorizLabel->setGeometry(0, 0, 150, 14);
 
 	settingsControlsLayout->addWidget(numSectionsHorizLineEdit = new QLineEdit);

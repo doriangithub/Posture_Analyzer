@@ -46,6 +46,9 @@ public:
 	Vector3D minYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  minimal coordinate Y fo Body
 	Vector3D maxYsurfPoint = Vector3D(0.0, 0.0, 0.0);	//  maximal coordinate Y fo Body
 
+	float minZ = 0.0;
+	float maxZ = 0.0;
+
 	//static const int MAX_NUMBER_HORIZONTS = 190;
 	//static const int getMaxNumberHorizonts();
 	void setNumOfHorizonts(int numHoriz);
@@ -76,9 +79,12 @@ public:
 	void resetData();
 	void setInputFilePath(QString filePath);
 	void calculateShiftToCenter();
+	void findMaxMinZvalue();
 	float shiftToCenter;
 	float sumMaxMin;
 	Data3D();
 	~Data3D();
+	float getMinimalZValue();
+	float getMaximalZValue();
 };
 

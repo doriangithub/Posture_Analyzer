@@ -489,7 +489,7 @@ void LeftGLWindow::paintGL()
 			GLint fullTransfomMatrixUniformLocationTriangle = glGetUniformLocation(programID, "fullTransfomMatrix");
 			glUniformMatrix4fv(fullTransfomMatrixUniformLocationTriangle, 1, GL_FALSE, &fullTransfomMatrixTriangl[0][0]);
 
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			//glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		}
 

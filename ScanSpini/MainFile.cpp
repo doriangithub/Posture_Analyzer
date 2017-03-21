@@ -11,11 +11,17 @@
 
 
 #include <QtWidgets\qapplication.h>
+//#include <QtWidgets\qQQmlApplicationEngine>
+
 #include "MainWidget.h"
 
 int main(int argc, char* argv[])
 {
 	QApplication app(argc, argv);
+
+	//QQmlApplicationEngine engine;
+	//engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+
 	MainWidget mainWidg;
 	mainWidg.setGeometry(50, 50, 1200, 600);
 	mainWidg.show();

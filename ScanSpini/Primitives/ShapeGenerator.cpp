@@ -355,32 +355,45 @@ ShapeData ShapeGenerator::makeRightBorder(Data3D *data3D)
 		float xBordMax = data3D->getMaxXsurfPoint().x;
 		float yBordMin = data3D->getMinYsurfPoint().y;
 		float yBordMax = data3D->getMaxYsurfPoint().y;
+		float zBordMax = data3D->getMaximalZValue();
+		float zBordMin = data3D->getMinimalZValue();
 
-		Vertex RightBorder[] =
+		// add 10% extra to the front, so it will be more vissible
+		zBordMax = zBordMax + (zBordMax - zBordMin) * 0.1;
+
+		// calculate location depending on body center
+		float bodyCenter = 0.0 - data3D->shiftToCenter;
+		// distance from body center calculate as 1/x from the whole width
+		float bordShift = (yBordMax - yBordMin) / 10.0;
+
+		float yBord = bodyCenter - bordShift;
+
+		
+		Vertex RightBorder[] =  
 		{
-			glm::vec3(xBordMax, yBordMin,  0.0f),
+			glm::vec3(xBordMax, yBord,  zBordMax), // 0.0
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMin, -2.0f),
+			glm::vec3(xBordMin, yBord, zBordMin),  // -2.0
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMin,  0.0f),
+			glm::vec3(xBordMin, yBord,  zBordMax),  // 0.0
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
 			//---------------------------------------
 
-			glm::vec3(xBordMax, yBordMin,  0.0f),
+			glm::vec3(xBordMax, yBord,  zBordMax),  // 0.0
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMax, yBordMin, -2.0f),
+			glm::vec3(xBordMax, yBord, zBordMin),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMin, -2.0f),
+			glm::vec3(xBordMin, yBord, zBordMin),  //yBordMin
 			glm::vec3(1.0f, 0.0f, 0.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
@@ -706,32 +719,44 @@ ShapeData ShapeGenerator::makeLeftBorder(Data3D *data3D)
 		float xBordMax = data3D->getMaxXsurfPoint().x;
 		float yBordMin = data3D->getMinYsurfPoint().y;
 		float yBordMax = data3D->getMaxYsurfPoint().y;
+		float zBordMax = data3D->getMaximalZValue();
+		float zBordMin = data3D->getMinimalZValue();
+
+		// add 10% extra to the front, so it will be more vissible
+		zBordMax = zBordMax + (zBordMax - zBordMin) * 0.1;
+
+		// calculate location depending on body center
+		float bodyCenter = 0.0 - data3D->shiftToCenter;
+		// distance from body center calculate as 1/x from the whole width
+		float bordShift = (yBordMax - yBordMin) / 10.0;
+
+		float yBord = bodyCenter + bordShift;
 
 		Vertex leftBorder[] =
 		{
-			glm::vec3(xBordMax, yBordMax,  0.0f),
+			glm::vec3(xBordMax, yBord,  zBordMax),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMax, -2.0f),
+			glm::vec3(xBordMin, yBord, zBordMin),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMax,  0.0f),
+			glm::vec3(xBordMin, yBord, zBordMax),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
 			//---------------------------------------
 
-			glm::vec3(xBordMax, yBordMax,  0.0f),
+			glm::vec3(xBordMax, yBord,  zBordMax),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMax, yBordMax, -2.0f),
+			glm::vec3(xBordMax, yBord, zBordMin),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 
-			glm::vec3(xBordMin, yBordMax, -2.0f),
+			glm::vec3(xBordMin, yBord, zBordMin),
 			glm::vec3(0.0f, 0.0f, 1.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f),
 

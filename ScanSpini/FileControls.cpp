@@ -36,8 +36,7 @@ FileControls::FileControls(Data3D *data3D, GraphicalControls *graphicalControls)
 	fileDataLabel->setMinimumWidth(40);
 	fileDataLabel->setText("Data file:");
 	fileDataLabel->setGeometry(0, 0, 400, 14);
-	//fileDataLabel->setAlignment(Qt::AlignCenter);
-	
+		
 	fileControlsLayout->addWidget(fileDataLineEdit = new QLineEdit);
 	fileDataLineEdit->setMinimumWidth(450);
 	//fileDataLineEdit->setText("C:\\DEVELOPMENT\\Data Files\\spina.stl");
